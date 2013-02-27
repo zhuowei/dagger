@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<h1>Dagger</h1>
+<div>Helps you cut through those "here's 4 pictures, now find me a sword" puzzles</div>
+<div>Uses the dictionary file shipped with Ubuntu 10.04. Thanks!</div>
+
+<div style="text-align:center;background-color: #eeeeee">
+Letters: <input id="lettersinput"><br>
+Word length: <input id="wordlengthinput"><br>
+<input type="submit" value="Go!" onclick="printWordList()"></input>
+</div>
+<div id="listoutput">Output will appear here</div>
+<script type="text/javascript">
+var lettersInput;
+var wordLengthInput;
+var wordList;
+var outputArea;
+
+function wordListLoadedHandler(e) {
+	wordList = e.target.responseText.split("\n");
+}
+
+
+function loadHandler() {
+	lettersInput = document.getElementById("lettersinput");
+	wordLengthInput = document.getElementById("wordlengthinput");
+	outputArea = document.getElementById("listoutput");
+	var wordListFetcher = new XMLHttpRequest();
+	wordListFetcher.onload = wordListLoadedHandler;
+	wordListFetcher.open("get", "words", true);
+	wordListFetcher.send();
+}
+
+function printWordList() {
+	var wordsWordsWords = findAllWords(lettersInput.value.toLowerCase(), parseInt(wordLengthInput.value));
+	outputArea.innerHTML = wordsWordsWords.join("<br>");
+}
+
+function findAllWords(letters, wordLength) {
+	var retval = [];
+	for (var i = 0; i < wordList.length; i++) {
+		var word = wordList[i].toLowerCase();
+		if (word.length != wordLength) continue;
+		var isTheWord = true;
+		for (var c = 0; c < word.length; c++) {
+			if (findInStr(word, word.substring(c, c+1)) > findInStr(letters, word.substring(c, c+1))) {
+				isTheWord = false;
+				break;
+			}
+		}
+		if (isTheWord) retval.push(word);
+	}
+	return retval;
+}
+
+function findInStr(str, expr) {
+	var a = str;
+	var retval = 0;
+	var loc = -1;
+	while((loc = a.indexOf(expr)) >= 0) {
+		retval++;
+		a = a.substring(loc + expr.length);
+	}
+	return retval;
+}
+window.onload = loadHandler;
+</script>
+</html>
